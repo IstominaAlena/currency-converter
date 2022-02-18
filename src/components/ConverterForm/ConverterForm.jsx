@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import PropTypes from "prop-types";
 import { useState, useEffect, useRef } from "react";
 import debounce from "lodash.debounce";
@@ -23,80 +24,32 @@ const ConverterForm = ({ data }) => {
   const isFirstRender = useRef(true);
 
   const findObj = ({ id, value }) => {
-    let setCode, setValue, setObj;
+    let setCode, setObj;
 
     if (id === "from-select") {
       setCode = setFromCode;
-      setValue = setFromValue;
       setObj = setFromObj;
     }
 
     if (id === "to-select") {
       setCode = setToCode;
-      setValue = setToValue;
       setObj = setToObj;
     }
 
     setCode(value);
 
     if (value === "UAH") {
-      setValue(calculateValue(id));
+      calculateValue();
       return;
     }
 
     const obj = data.find((item) => item.ccy === value);
+
     !isEmpty(obj) && setObj(obj);
 
-    setValue(calculateValue(id));
+    calculateValue();
 
     return;
-  };
-
-  useEffect(() => {
-    const fromInput = document.getElementById("from-input");
-    const fromSelect = document.getElementById("from-select");
-    const toSelect = document.getElementById("to-select");
-
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      chooseSelected(fromSelect, "USD");
-      chooseSelected(toSelect, "UAH");
-      fromInput.value = 1;
-    }
-
-    findObj(fromSelect);
-    findObj(toSelect);
-    calculateAmount(fromInput);
-  }, [findObj]);
-
-  const calculateValue = (id) => {
-    let obj1, obj2, code;
-
-    if (fromCode === toCode) {
-      const result = 1;
-      return result;
-    }
-
-    if (id === "from-select") {
-      obj1 = toObj;
-      obj2 = fromObj;
-      code = fromCode;
-    }
-
-    if (id === "to-select") {
-      obj1 = fromObj;
-      obj2 = toObj;
-      code = toCode;
-    }
-    debugger;
-    if (code === "UAH") {
-      const result = (1 / obj1.buy).toFixed(2);
-      return result;
-    }
-    const result = !isEmpty(obj1)
-      ? (obj2.buy / obj1.buy).toFixed(2)
-      : Number(obj2.buy).toFixed(2);
-    return result;
   };
 
   const calculateAmount = ({ id, value }) => {
@@ -117,6 +70,49 @@ const ConverterForm = ({ data }) => {
     return;
   };
 
+  useEffect(() => {
+    const fromInput = document.getElementById("from-input");
+    const fromSelect = document.getElementById("from-select");
+    const toSelect = document.getElementById("to-select");
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      chooseSelected(fromSelect, "USD");
+      chooseSelected(toSelect, "UAH");
+      fromInput.value = 1;
+    }
+
+    findObj(fromSelect);
+    findObj(toSelect);
+    calculateAmount(fromInput);
+  }, [calculateAmount, findObj]);
+
+  const calculateValue = () => {
+    if (fromCode === toCode) {
+      setFromValue(1);
+      setToValue(1);
+      return;
+    }
+
+    if (fromCode !== toCode && toCode !== "UAH" && fromCode !== "UAH") {
+      setFromValue((fromObj.buy / toObj.buy).toFixed(3));
+      setToValue((toObj.buy / fromObj.buy).toFixed(3));
+      return;
+    }
+
+    if (fromCode === "UAH" && toCode !== "UAH") {
+      setFromValue((1 / toObj.buy).toFixed(3));
+      setToValue(Number(toObj.buy).toFixed(3));
+      return;
+    }
+
+    if (fromCode !== "UAH" && toCode === "UAH") {
+      setFromValue(Number(fromObj.buy).toFixed(3));
+      setToValue((1 / fromObj.buy).toFixed(3));
+      return;
+    }
+  };
+
   const onHandleChange = (e) => {
     const { id } = e.target;
     if (id === "from-input" || id === "to-input") {
@@ -128,6 +124,7 @@ const ConverterForm = ({ data }) => {
   };
 
   const onHandleClick = () => {
+    debugger;
     const fromSelect = document.getElementById("from-select");
     const toSelect = document.getElementById("to-select");
     const fromInput = document.getElementById("from-input");
