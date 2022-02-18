@@ -75,23 +75,23 @@ const ConverterForm = ({ data }) => {
   const calculateValue = (id, value) => {
     if (id === "from-select") {
       if (value === "UAH") {
-        const result = (1 / toObj.buy).toFixed(4);
+        const result = (1 / toObj.buy).toFixed(2);
         return result;
       }
       const result = !isEmpty(toObj)
-        ? (fromObj.buy / toObj.buy).toFixed(4)
-        : Number(fromObj.buy).toFixed(4);
+        ? (fromObj.buy / toObj.buy).toFixed(2)
+        : Number(fromObj.buy).toFixed(2);
       return result;
     }
 
     if (id === "to-select") {
       if (value === "UAH") {
-        const result = (1 / fromObj.buy).toFixed(4);
+        const result = (1 / fromObj.buy).toFixed(2);
         return result;
       }
       const result = !isEmpty(fromObj)
-        ? (toObj.buy / fromObj.buy).toFixed(4)
-        : Number(toObj.buy).toFixed(4);
+        ? (toObj.buy / fromObj.buy).toFixed(2)
+        : Number(toObj.buy).toFixed(2);
       return result;
     }
   };
@@ -99,12 +99,12 @@ const ConverterForm = ({ data }) => {
   const calculateAmount = ({ id, value }) => {
     if (id === "from-input") {
       const resultInput = document.getElementById("to-input");
-      resultInput.value = (value * fromValue).toFixed(4);
+      resultInput.value = (value * fromValue).toFixed(2);
       return;
     }
 
     const resultInput = document.getElementById("from-input");
-    resultInput.value = (value * toValue).toFixed(4);
+    resultInput.value = (value * toValue).toFixed(2);
     return;
   };
 

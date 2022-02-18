@@ -21,3 +21,11 @@
     width: 40%;
   }
 }
+
+@media screen and (min-width: 1200px) {
+  .select {
+    left: 65%;
+
+    width: 25%;
+  }
+}
