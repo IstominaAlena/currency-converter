@@ -156,8 +156,7 @@ const ConverterForm = ({ data }) => {
 
             {fromValue && (
               <span className={s.text}>
-                1 {fromCode} = {fromValue}
-                {toCode}
+                1 {fromCode} = {fromValue} {toCode}
               </span>
             )}
           </div>
@@ -180,8 +179,7 @@ const ConverterForm = ({ data }) => {
 
             {toValue && (
               <span className={s.text}>
-                1 {toCode} = {toValue}
-                {fromCode}
+                1 {toCode} = {toValue} {fromCode}
               </span>
             )}
           </div>
