@@ -23,36 +23,33 @@ const ConverterForm = ({ data }) => {
   const isFirstRender = useRef(true);
 
   const findObj = ({ id, value }) => {
+    let setCode, setValue, setObj;
+
     if (id === "from-select") {
-      setFromCode(value);
-      if (value === "UAH") {
-        setFromValue(calculateValue(id, value));
-        return;
-      }
-      const obj = data.find((item) => item.ccy === value);
-      !isEmpty(obj) && setFromObj(obj);
-      setFromValue(calculateValue(id, value));
-      return;
+      setCode = setFromCode;
+      setValue = setFromValue;
+      setObj = setFromObj;
     }
 
     if (id === "to-select") {
-      setToCode(value);
+      setCode = setToCode;
+      setValue = setToValue;
+      setObj = setToObj;
+    }
 
-      if (value === "UAH") {
-        setToValue(calculateValue(id, value));
-        return;
-      }
-      try {
-        const obj = data.find((item) => item.ccy === value);
-        !isEmpty(obj) && setToObj(obj);
+    setCode(value);
 
-        setToValue(calculateValue(id, value));
-      } catch (error) {
-        console.log(error);
-      }
-
+    if (value === "UAH") {
+      setValue(calculateValue(id));
       return;
     }
+
+    const obj = data.find((item) => item.ccy === value);
+    !isEmpty(obj) && setObj(obj);
+
+    setValue(calculateValue(id));
+
+    return;
   };
 
   useEffect(() => {
@@ -72,39 +69,51 @@ const ConverterForm = ({ data }) => {
     calculateAmount(fromInput);
   }, [findObj]);
 
-  const calculateValue = (id, value) => {
-    if (id === "from-select") {
-      if (value === "UAH") {
-        const result = (1 / toObj.buy).toFixed(2);
-        return result;
-      }
-      const result = !isEmpty(toObj)
-        ? (fromObj.buy / toObj.buy).toFixed(2)
-        : Number(fromObj.buy).toFixed(2);
+  const calculateValue = (id) => {
+    let obj1, obj2, code;
+
+    if (fromCode === toCode) {
+      const result = 1;
       return result;
+    }
+
+    if (id === "from-select") {
+      obj1 = toObj;
+      obj2 = fromObj;
+      code = fromCode;
     }
 
     if (id === "to-select") {
-      if (value === "UAH") {
-        const result = (1 / fromObj.buy).toFixed(2);
-        return result;
-      }
-      const result = !isEmpty(fromObj)
-        ? (toObj.buy / fromObj.buy).toFixed(2)
-        : Number(toObj.buy).toFixed(2);
+      obj1 = fromObj;
+      obj2 = toObj;
+      code = toCode;
+    }
+    debugger;
+    if (code === "UAH") {
+      const result = (1 / obj1.buy).toFixed(2);
       return result;
     }
+    const result = !isEmpty(obj1)
+      ? (obj2.buy / obj1.buy).toFixed(2)
+      : Number(obj2.buy).toFixed(2);
+    return result;
   };
 
   const calculateAmount = ({ id, value }) => {
+    let amount, resultId;
+
     if (id === "from-input") {
-      const resultInput = document.getElementById("to-input");
-      resultInput.value = (value * fromValue).toFixed(2);
-      return;
+      amount = fromValue;
+      resultId = "to-input";
     }
 
-    const resultInput = document.getElementById("from-input");
-    resultInput.value = (value * toValue).toFixed(2);
+    if (id === "to-input") {
+      amount = toValue;
+      resultId = "from-input";
+    }
+
+    const resultInput = document.getElementById(resultId);
+    resultInput.value = (value * amount).toFixed(2);
     return;
   };
 
@@ -121,12 +130,14 @@ const ConverterForm = ({ data }) => {
   const onHandleClick = () => {
     const fromSelect = document.getElementById("from-select");
     const toSelect = document.getElementById("to-select");
+    const fromInput = document.getElementById("from-input");
 
     fromSelect.value = toCode;
     toSelect.value = fromCode;
 
     findObj(fromSelect);
     findObj(toSelect);
+    calculateAmount(fromInput);
   };
 
   return (
